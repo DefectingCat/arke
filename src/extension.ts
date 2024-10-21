@@ -7,7 +7,7 @@ import * as vscode from "vscode";
 export function activate(context: vscode.ExtensionContext) {
     // Use the console to output diagnostic information (console.log) and errors (console.error)
     // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "arke" is now active!');
+    const window = vscode.window;
 
     // The command has been defined in the package.json file
     // Now provide the implementation of the command with registerCommand
@@ -15,9 +15,25 @@ export function activate(context: vscode.ExtensionContext) {
     const disposable = vscode.commands.registerCommand(
         "arke.helloWorld",
         () => {
-            // The code you place here will be executed every time your command is executed
-            // Display a message box to the user
-            vscode.window.showInformationMessage("Hello World from arke!");
+            const editor = window.activeTextEditor;
+            if (!editor) {
+                window.showErrorMessage("No file opend");
+                return;
+            }
+            const selection = editor.selection;
+            if (selection && !selection.isEmpty) {
+                const selectionRange = new vscode.Range(
+                    selection.start.line,
+                    selection.start.character,
+                    selection.end.line,
+                    selection.end.character
+                );
+                const highlighted = editor.document.getText(selectionRange);
+                window.showInformationMessage(highlighted);
+            } else {
+                window.showErrorMessage("No text selected");
+                return;
+            }
         }
     );
 
